@@ -26,7 +26,7 @@
       </div>
       <div class="content active">
 
-        <div class="ui action input center aligned container">
+        <div class="ui input center aligned container">
           <button class="ui icon button">
     <i class="angle double left icon"></i>
     First
@@ -35,9 +35,13 @@
     <i class="angle left icon"></i>
     Previous
   </button>
-
+ <a class="item">
+    <div class="ui red horizontal label">Total Items</div>
+  </a>
    <input type="text" class="ui center aligned segment" placeholder="Current Page">
-    
+    <a class="item">&nbsp;
+    <div class="ui red horizontal label">Total Pages</div>
+  </a>
           <button class="ui icon button">
    Next
     <i class="angle right icon"></i>
@@ -46,17 +50,8 @@
     Last
     <i class="angle double right icon"></i>
   </button>
-        </div>
-
+        </div>  
       
-  <a class="ui label center aligned segment">
-    11
-  </a>
-  <a class="ui label center aligned segment">
-    22
-  </a>
-      
-
         <div class="ui middle aligned divided list">
           <div class="item">
             <div class="right floated content">
@@ -65,7 +60,10 @@
 
             <img class="ui avatar image">
             <div class="content">
-              Lena
+                <a class="header">Stevie Feliciano</a>
+      <div class="description">
+        <p>Stevie Feliciano is a <a>library scientist</a> living in New York City. She likes to spend her time reading, running, and writing.</p>
+      </div>
             </div>
           </div>
           <div class="item">
