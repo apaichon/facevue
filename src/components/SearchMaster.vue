@@ -5,7 +5,7 @@
       <i class="icon search"></i>
       {{searchText}}
       </button>
-      <div class="ui teal labeled icon button" @click="searchClick">
+      <div class="ui teal labeled icon button" @click="createClicked">
          {{createText}}
          <i class="add icon"></i>
       </div>
@@ -17,8 +17,8 @@
       name: 'searchmaster',
       props: ['searchText', 'createText', 'searchPlaceholder', 'menuId'],
       methods: {
-        searchClick: function () {
-          this.$emit('searchClick')
+        createClicked: function () {
+          this.$emit('createClicked')
         }
       }
     }

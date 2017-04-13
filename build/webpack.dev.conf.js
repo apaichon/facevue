@@ -40,5 +40,10 @@ module.exports = merge(baseWebpackConfig, {
       Semantic: 'semantic-ui-css',
       'semantic-ui': 'semantic-ui-css'
     })
-  ]
+  ],
+  resolve: {
+    alias: {
+      jquery: "jquery/dist/jquery"
+    }
+  }
 })
