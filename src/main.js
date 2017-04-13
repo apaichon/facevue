@@ -4,6 +4,8 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import '../node_modules/semantic-ui-css/semantic.min.css'
+// import '../node_modules/jquery/dist/jquery.min.js'
+import $ from '../node_modules/jquery/dist/jquery.min.js'
 // import Vuetify from 'vuetify'
 // Vue.use(Vuetify)
 // Vue.config.productionTip = false
