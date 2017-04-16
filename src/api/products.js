@@ -1,24 +1,28 @@
 // import restApi from '@/classes/restApi'
-import fetchApi from '@/classes/fetchApi'
+import restApi from '@/classes/restApi'
 import config from '../../config'
 
 var host = config.dev.facemindApiHost
 var urls = {
   ADD_PRODUCTS: `${host.protocol}/${host.name}:${host.port}/api/masterdata/products/add`,
-  GET_PRODUCTS: `${host.protocol}/${host.name}:${host.port}/api/masterdata/products/getAll`,
-  UPDATE_PRODUCT: `${host.protocol}/${host.name}:${host.port}/api/masterdata/products/update`
+  GET_PRODUCTS: `${host.protocol}/${host.name}:${host.port}/api/masterdata/products/gets`,
+  UPDATE_PRODUCT: `${host.protocol}/${host.name}:${host.port}/api/masterdata/products/edit`,
+  REMOVE_PRODUCT: `${host.protocol}/${host.name}:${host.port}/api/masterdata/products/remove`
 }
 
 export default {
   methods: {
     addProducts: (products) => {
-      return fetchApi.post(urls.ADD_PRODUCTS, products)
+      return restApi.post(urls.ADD_PRODUCTS, products)
     },
     getProducts: (condition) => {
-      return fetchApi.post(urls.GET_PRODUCTS, condition)
+      return restApi.post(urls.GET_PRODUCTS, condition)
     },
     updateProduct: (condition) => {
-      return fetchApi.post(urls.UPDATE_PRODUCT, condition)
+      return restApi.post(urls.UPDATE_PRODUCT, condition)
+    },
+    removeProduct: (condition) => {
+      return restApi.post(urls.REMOVE_PRODUCT, condition)
     }
   }
 }

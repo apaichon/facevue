@@ -1,6 +1,8 @@
-import $ from 'jquery'
+import axios from 'axios'
+// import $ from 'jquery'
+
 export default {
   post: (url, data) => {
-    return $.post(url, data)
+    return axios.post(url, data)
   }
 }

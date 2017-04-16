@@ -30,24 +30,63 @@ export default function () {
       descKey: 'productName',
       itemsKey: 'products',
       itemKey: 'product',
-      primaryKey: 'productCode'
+      primaryKey: 'productCode',
+      moreDetails: {
+        fields: [
+          {
+            label: 'Product Code',
+            keyId: 'productCode'
+          },
+          {
+            label: 'Product Name',
+            keyId: 'productName'
+          },
+          {
+            label: 'Product Category',
+            keyId: 'productCategory'
+          },
+          {
+            label: 'Product Type',
+            keyId: 'productType'
+          },
+          {
+            label: 'Product Standard Value',
+            keyId: 'productValue'
+          },
+          {
+            label: 'Product Unit',
+            keyId: 'productUnit'
+          },
+          {
+            label: 'Status',
+            keyId: 'status'
+          }
+        ]
+      }
     },
     ids: {
       selectedItemId: 'ddlProductSelected',
-      modalId: 'modalMessage'
+      modalId: 'modalMessage',
+      confirmId: 'confirmModal'
     },
     actionKeys: {
       ADD_ITEM: 'addProducts',
       GET_ITEM: 'getProduct',
       GET_ITEMS: 'getProducts',
       GET_MODE: 'getMode',
+      GET_TEXTSEARCH: 'getTextSearch',
+      GET_CURRENTPAGE: 'getCurrentPage',
       SET_MODE: 'setMode',
       SET_ITEMS: 'setProducts',
-      UPDATE_ITEM: 'updateProduct'
+      SET_TEXTSEARCH: 'setTextSearch',
+      SET_CURRENTPAGE: 'setCurrentPage',
+      UPDATE_ITEM: 'updateProduct',
+      REMOVE_ITEM: 'removeProduct'
     },
     messages: {
       headerTitle: 'Completed',
-      message: 'Insert Successfully'
+      message: 'Insert Successfully',
+      deleteMsg: 'Are you sure to delete $item ?'
     },
     states: {
       fieldMessages: [],
@@ -57,7 +96,12 @@ export default function () {
         {code: 0, name: 'In Active'},
         {code: 1, name: 'Active'}
       ],
-      mode: modes.READ
+      mode: modes.READ,
+      itemsDetail: [],
+      currentPage: 1,
+      totalPages: 1,
+      totalItems: 0,
+      saveType: 0
     },
     validateRules: {
       fields: {
@@ -74,11 +118,17 @@ export default function () {
             type: 'empty',
             prompt: 'Please enter your product name!'
           }]
+        },
+        statusCode: {
+          identifier: 'statusCode',
+          rules: [{
+            type: 'empty',
+            prompt: 'Please enter your status!'
+          }]
         }
       }
     }
   }
-
   const actions = {
     uis: {
       createAccordion: () => {
@@ -87,20 +137,32 @@ export default function () {
       disabledUI: (id, isDisabled) => {
         $(id).attr('disabled', isDisabled)
       },
+      disableFields: (isDisabled) => {
+        if (isDisabled) {
+          $('input').addClass('disabled')
+        } else {
+          $('.field.disabled').removeClass('disabled')
+        }
+      },
       focusUI: (id) => {
         $(id).focus()
+      },
+      openConfirm: () => {
+        $('#confirmModal').modal('show')
       },
       openEditor: () => {
         $('.ui.accordion').accordion('open', 1)
       },
       openList: () => {
         $('.ui.accordion').accordion('open', 0)
+        $('.ui.accordion').accordion('close', 1)
       },
       hideError: () => {
         $('.ui.error.message').transition('hide')
       },
       selectedDropdown: (index) => {
-        $('#' + members.ids.selectedItemId).prop('selectedIndex', index)
+        // $('#' + members.ids.selectedItemId).prop('selectedIndex', index)
+        members.states.selectedItem = index
       },
       showError: () => {
         $('.ui.error.message').transition('show')
@@ -109,18 +171,23 @@ export default function () {
         $('.ui.form').form(rules)
       },
       showModalSuccess: (msg) => {
-        $('#' + members.ids.modalId).removeClass('error message')
-        $('#' + members.ids.modalId).addClass('success message')
-        $('.ui.modal').modal('show')
+        var modalId = '#' + members.ids.modalId
+        $(modalId).removeClass('error message')
+        $(modalId).addClass('success message')
+        $(modalId).modal('show')
         members.messages.headerTitle = 'Completed'
         members.messages.message = msg
       },
       showModalFail: (msg) => {
-        $('#' + members.ids.modalId).removeClass('success message')
-        $('#' + members.ids.modalId).addClass('error message')
-        $('.ui.modal').modal('show')
+        var modalId = '#' + members.ids.modalId
+        $(modalId).removeClass('success message')
+        $(modalId).addClass('error message')
+        $(modalId).modal('show')
         members.messages.headerTitle = 'Error'
         members.messages.message = msg
+      },
+      showMoreDetail: () => {
+        $('#moredetail').modal('show')
       }
     },
     utils: {
@@ -141,8 +208,13 @@ export default function () {
     crud: {
       setMode: (mode) => {
         switch (mode) {
+          case modes.READ:
+            dispatch.setMode(modes.READ)
+            actions.uis.disableFields(true)
+            break
           case modes.CREATE:
             actions.crud.create()
+            actions.uis.disableFields(false)
             break
           case modes.UPDATE:
             actions.crud.update()
@@ -153,57 +225,149 @@ export default function () {
         dispatch.setMode(modes.CREATE)
         actions.uis.openEditor()
         actions.uis.disabledUI('#' + members.bindingKeys.headerKey, false)
-        members.states.item = {}
+        members.states.item = {statusCode: 0}
         actions.uis.focusUI('#' + members.bindingKeys.headerKey)
+      },
+      readMoreDetail: (index) => {
+        members.states.item = dispatch.getItemByIndex(index)
+        members.states.itemsDetail = actions.crud.convertToMoreDetail(members.states.item)
+        dispatch.setMode(modes.READ)
+        actions.uis.showMoreDetail()
+      },
+      convertToMoreDetail: (item) => {
+        var itemsDetail = []
+        var fields = members.bindingKeys.moreDetails.fields
+        for (let i = 0; i < fields.length; i++) {
+          var field = {}
+          field.label = fields[i].label
+          field.value = item[fields[i].keyId]
+          itemsDetail.push(field)
+        }
+        return itemsDetail
       },
       update: (index) => {
         console.log('item index:', index)
         members.states.item = dispatch.getItemByIndex(index)
-        console.log('item', members.states.item)
         dispatch.setMode(modes.UPDATE)
         actions.uis.openEditor()
+        actions.uis.disableFields(false)
         actions.uis.disabledUI('#' + members.bindingKeys.headerKey, true)
-        actions.uis.focusUI('#' + members.bindingKeys.headerKey)
+        actions.uis.focusUI('#' + members.bindingKeys.descKey)
+        actions.uis.selectedDropdown(index)
+      },
+      del: (index) => {
+        var item = dispatch.getItemByIndex(index)
+        members.states.item = item
+        members.messages.deleteMsg = `Are you sure to delete product Name :${item.productName} ?`
+        // members.states.selectedItem = item
+        actions.uis.openConfirm()
       },
       addItem: (item) => {
+        console.log('add Item', item)
         api.methods[members.actionKeys.ADD_ITEM](item)
-        .done(function (result) {
-          console.log('insert result from server:', result)
-          actions.uis.showModalSuccess(`Insert product ${item.productName} is sucessfully.`)
-          actions.crud.getItems({})
+        .then(function (result) {
+          if (result.status === 200) {
+            console.log('insert result from server:', result)
+            if (members.states.saveType === 0) {
+              actions.crud.getItems({'search': '', 'currentPage': 1})
+              actions.uis.showModalSuccess(`Insert product ${item.productName} is sucessfully.`)
+            } else {
+              actions.crud.setMode(modes.CREATE)
+            }
+          }
         })
-        .fail((result) => {
+        .catch((result) => {
           actions.uis.showModalFail(`Insert product ${item.productName} is failed.`)
         })
       },
       getItems: (condition) => {
         api.methods[members.actionKeys.GET_ITEMS](condition)
-        .done(function (result) {
-          dispatch.setItems(result.output)
-          actions.uis.openList()
+        .then(function (result) {
+          if (result.data.code === 200) {
+            console.log('get items from server', result)
+            dispatch.setItems(result.data.results.data)
+            members.states.totalItems = result.data.results.totalRecords
+            members.states.totalPages = result.data.results.totalPages
+            actions.crud.setMode(modes.READ)
+            actions.uis.openList()
+          }
         })
-        .fail((result) => {
+        .catch((result) => {
           dispatch.setItems([])
+          actions.uis.showModalFail(JSON.stringify(result))
         })
+      },
+      searchItems: (textSearch) => {
+        const condition = {search: textSearch, currentPage: 1}
+        actions.crud.getItems(condition)
+      },
+      gotoPage: () => {
+        const textSearch = dispatch.getTextSearch()
+        const currentPage = dispatch.getCurrentPage()
+        actions.crud.getItems({search: textSearch, currentPage: currentPage})
+      },
+      firstPage: () => {
+        dispatch.setCurrentPage(1)
+        actions.crud.gotoPage()
+      },
+      previousPage: () => {
+        var currentPage = dispatch.getCurrentPage()
+        currentPage--
+        currentPage = (currentPage < 1 ? 1 : currentPage)
+        dispatch.setCurrentPage(currentPage)
+        actions.crud.gotoPage()
+      },
+      nextPage: () => {
+        var currentPage = dispatch.getCurrentPage()
+        currentPage++
+        currentPage = (currentPage > members.states.totalPages ? members.states.totalPages : currentPage)
+        dispatch.setCurrentPage(currentPage)
+        actions.crud.gotoPage()
+      },
+      lastPage: () => {
+        dispatch.setCurrentPage(members.states.totalPages)
+        actions.crud.gotoPage()
       },
       updateItem: (item) => {
         var data = {condition: {}}
         data.condition[members.bindingKeys.primaryKey] = item[members.bindingKeys.primaryKey]
         data.data = item
-        console.log('data', JSON.stringify(data))
-        api.methods[members.actionKeys.UPDATE_ITEM](JSON.stringify(data))
-        .done((result) => {
-          console.log('update result from server', result)
-          actions.uis.showModalSuccess(`Update product ${item.productName} is sucessfully.`)
-          actions.crud.getItems({})
+        delete data.data['_id']
+        console.log('update data', data)
+        api.methods[members.actionKeys.UPDATE_ITEM](data)
+        .then((result) => {
+          if (result.status === 200) {
+            console.log('update result from server', result)
+            if (members.states.saveType === 0) {
+              actions.uis.showModalSuccess(`Update product ${item.productName} is sucessfully.`)
+              actions.crud.getItems({search: '', currentPage: 1})
+            } else {
+              actions.crud.setMode(modes.CREATE)
+            }
+          }
         })
-        .fail(() => {
-
+        .catch((err) => {
+          actions.uis.showModalFail(JSON.stringify(err))
+        })
+      },
+      remove: () => {
+        $(`#${members.ids.confirmId}`).hide()
+        var item = members.states.item
+        var data = {}
+        data[members.bindingKeys.primaryKey] = item[members.bindingKeys.primaryKey]
+        console.log('data delete', data)
+        api.methods[members.actionKeys.REMOVE_ITEM](data)
+        .then((result) => {
+          if (result.status === 200) {
+            console.log('Remove result from server', result)
+            actions.uis.showModalSuccess(`Remove product ${item.productName} is sucessfully.`)
+            actions.crud.getItems({'search': '', 'currentPage': 1})
+            actions.crud.setMode(modes.READ)
+          }
         })
       }
     }
   }
-
   const dispatch = {
     addItemToStore: (item) => {
       _this.store.dispatch(members.actionKeys.ADD_ITEM, item).then((result) => {
@@ -223,14 +387,27 @@ export default function () {
     getMode: () => {
       return _this.store.getters.mode
     },
+    getTextSearch: () => {
+      console.log('get Text Search', _this.store.getters.textSearch)
+      return _this.store.getters.textSearch
+    },
+    getCurrentPage: () => {
+      return _this.store.getters.currentPage
+    },
     setMode: (mode) => {
       _this.store.dispatch(members.actionKeys.SET_MODE, mode)
     },
     setItems: (items) => {
       _this.store.dispatch(members.actionKeys.SET_ITEMS, items)
+    },
+    setTextSearch: (textSearch) => {
+      _this.store.dispatch(members.actionKeys.SET_TEXTSEARCH, textSearch)
+    },
+    setCurrentPage: (page) => {
+      page = (page < 1 ? 1 : (page > members.states.totalPages ? members.states.totalPages : page))
+      _this.store.dispatch(members.actionKeys.SET_CURRENTPAGE, page)
     }
   }
-
   const events = {
     onSuccess: () => {
       actions.uis.hideError()
@@ -250,10 +427,23 @@ export default function () {
       return false
     },
     onSave: () => {
+      members.states.saveType = 0
       members.validateRules.onFailure = events.onFailure
       members.validateRules.onSuccess = events.onSuccess
       actions.uis.validateForm(members.validateRules)
+    },
+    onSaveNew: () => {
+      members.states.saveType = 1
+      members.validateRules.onFailure = events.onFailure
+      members.validateRules.onSuccess = events.onSuccess
+      actions.uis.validateForm(members.validateRules)
+    },
+    onSelectedItem: () => {
+      // console.log('selected Item', members.states.selectedItem)
+      members.states.item = dispatch.getItemByIndex(members.states.selectedItem)
+      // members.states.item = members.states.selectedItem
     }
+
   }
 
   const use = (opts) => {

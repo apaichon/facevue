@@ -4,9 +4,9 @@
     <div v-for="(item, index) in getItems" class="item">
         <div class="right floated content">
             <div class="ui buttons">
-                <button name="buttonEditor" class="ui orange basic button" data-content="Edit Item" @click="editClicked(index)" ><i class="write icon"></i></button>
-                <button @click="deleteClicked" name="buttonEditor" class="ui red basic button" data-content="Delete Item"><i class="erase icon"></i></button>
-                <button @click="moreClicked" name="buttonEditor" class="ui teal basic button" data-content="View more item description"><i class="list icon"></i></button>
+                <button @click="editClicked(index)" name="buttonEditor" class="ui orange basic button" data-content="Edit Item"  ><i class="write icon"></i></button>
+                <button @click="deleteClicked(index)" name="buttonEditor" class="ui red basic button" data-content="Delete Item"><i class="erase icon"></i></button>
+                <button @click="moreClicked(index)" name="buttonEditor" class="ui teal basic button" data-content="View more item description"><i class="list icon"></i></button>
             </div>
         </div>
       
@@ -36,14 +36,14 @@
       },
       methods: {
         editClicked: function (index) {
-          console.log('Edit Clicked', index)
+          // console.log('Edit Clicked', index)
           this.$emit('editClicked', index)
         },
-        deleteClicked: function () {
-          this.$emit('deleteClick')
+        deleteClicked: function (index) {
+          this.$emit('deleteClicked', index)
         },
-        moreClicked: function () {
-          this.$emit('moreClick')
+        moreClicked: function (index) {
+          this.$emit('moreClicked', index)
         }
       }
 

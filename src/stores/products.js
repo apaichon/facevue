@@ -9,13 +9,17 @@ export default new Vuex.Store({
     products: [],
     product: {},
     mode: crudMode.CREATE,
-    isValid: false
+    isValid: false,
+    textSearch: '',
+    currentPage: 1
   },
   getters: {
     mode: state => state.mode,
     isValid: state => state.isValid,
     product: state => state.product,
-    products: state => state.products
+    products: state => state.products,
+    textSearch: state => state.textSearch,
+    currentPage: state => state.currentPage
   },
   mutations: {
     ADD_PRODUCTS (state, product) {
@@ -36,6 +40,12 @@ export default new Vuex.Store({
     GET_ISVALID (state) {
       return state.isValid
     },
+    GET_TEXTSEARCH (state) {
+      return state.textSearch
+    },
+    GET_CURRENTPAGE (state) {
+      return state.currentPage
+    },
     SET_ISVALID (state, valid) {
       state.isValid = valid
     },
@@ -48,6 +58,13 @@ export default new Vuex.Store({
     SET_PRODUCTS (state, products) {
       state.products = products
       console.log('state', state.products)
+    },
+    SET_TEXTSEARCH (state, textSearch) {
+      state.textSearch = textSearch
+      console.log('state', state.textSearch)
+    },
+    SET_CURRENTPAGE (state, page) {
+      state.currentPage = page
     }
   },
   actions: {
@@ -66,6 +83,12 @@ export default new Vuex.Store({
     getIsValid ({commit}) {
       commit('GET_ISVALID')
     },
+    getTextSearch ({commit}) {
+      commit('GET_TEXTSEARCH')
+    },
+    getCurrentPage ({commit}) {
+      commit('GET_CURRENTPAGE')
+    },
     newProduct ({commit}) {
       commit('NEW_PRODUCT')
     },
@@ -77,6 +100,12 @@ export default new Vuex.Store({
     },
     setProducts ({commit}, products) {
       commit('SET_PRODUCTS', products)
+    },
+    setTextSearch ({commit}, textSearch) {
+      commit('SET_TEXTSEARCH', textSearch)
+    },
+    setCurrentPage ({commit}, page) {
+      commit('SET_CURRENTPAGE', page)
     }
   }
 })
