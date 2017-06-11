@@ -71,6 +71,12 @@ var readyPromise = new Promise(resolve => {
   _resolve = resolve
 })
 
+/* var MongoDB = require('../dao/MongoDB')
+var db = new MongoDB()
+db.init({})
+console.log('isConnected', db.isConnected)
+*/
+
 console.log('> Starting dev server...')
 devMiddleware.waitUntilValid(() => {
   console.log('> Listening at ' + uri + '\n')

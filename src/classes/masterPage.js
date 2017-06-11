@@ -1,9 +1,9 @@
 import * as modes from '@/stores/crudMode'
 import $ from 'jquery'
-import api from '@/api/products'
 
-export default function () {
+export default function (api) {
   var _this = this
+
   const members = {
     labels: {
       dataPager: {
@@ -161,7 +161,6 @@ export default function () {
         $('.ui.error.message').transition('hide')
       },
       selectedDropdown: (index) => {
-        // $('#' + members.ids.selectedItemId).prop('selectedIndex', index)
         members.states.selectedItem = index
       },
       showError: () => {
@@ -259,7 +258,6 @@ export default function () {
         var item = dispatch.getItemByIndex(index)
         members.states.item = item
         members.messages.deleteMsg = `Are you sure to delete product Name :${item.productName} ?`
-        // members.states.selectedItem = item
         actions.uis.openConfirm()
       },
       addItem: (item) => {
@@ -268,7 +266,9 @@ export default function () {
         .then(function (result) {
           if (result.status === 200) {
             console.log('insert result from server:', result)
-            if (members.states.saveType === 0) {
+            if (result.data.code === 500) {
+              actions.uis.showModalFail(`Insert product ${item[members.bindingKeys.headerKey]} is failed.`)
+            } else if (members.states.saveType === 0) {
               actions.crud.getItems({'search': '', 'currentPage': 1})
               actions.uis.showModalSuccess(`Insert product ${item.productName} is sucessfully.`)
             } else {
@@ -277,7 +277,7 @@ export default function () {
           }
         })
         .catch((result) => {
-          actions.uis.showModalFail(`Insert product ${item.productName} is failed.`)
+          actions.uis.showModalFail(`Insert ${result.message}.`)
         })
       },
       getItems: (condition) => {
@@ -439,11 +439,12 @@ export default function () {
       actions.uis.validateForm(members.validateRules)
     },
     onSelectedItem: () => {
-      // console.log('selected Item', members.states.selectedItem)
       members.states.item = dispatch.getItemByIndex(members.states.selectedItem)
-      // members.states.item = members.states.selectedItem
+      dispatch.setMode(modes.UPDATE)
+      actions.uis.disableFields(false)
+      actions.uis.disabledUI('#' + members.bindingKeys.headerKey, true)
+      actions.uis.focusUI('#' + members.bindingKeys.descKey)
     }
-
   }
 
   const use = (opts) => {

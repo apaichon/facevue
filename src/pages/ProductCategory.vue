@@ -17,37 +17,27 @@
       </div>
       <div class="content">
             <div class="field">
-                <label>Product Selected</label>
-                <select class="ui primary dropdown" id="ddlProductSelected" v-model="states.selectedItem" @change="selectedItem">
-                    <option v-for="(a, index) in getItems" :value="index" >{{a.productCode + '-' + a.productName}} </option>
+                <label>Product Category Selected</label>
+                <select class="ui primary dropdown" id="ddlProductCatgegorySelected" v-model="states.selectedItem" @change="selectedItem">
+                    <option v-for="(a, index) in getItems" :value="index" >{{a.productCategoryCode + '-' + a.productCategoryName}} </option>
                 </select>
             </div>
        <form class="ui form" v-on:submit.prevent>
         <div class="ui divider"></div>
             <div class="field required">
-                <label>Product Code</label>
-                <input id="productCode" type="text" v-model="states.item.productCode" name="productCode" placeholder="Product Code">
+                <label>Product Category Code</label>
+                <input id="productCategoryCode" type="text" v-model="states.item.productCategoryCode" name="productCategoryCode" placeholder="Product Category Code">
             </div>
             <div class="field required">
-                <label>Product Name</label>
-                <input id="productName" type="text" name="productName" v-model="states.item.productName" placeholder="Product Name">
+                <label>Product Category Name</label>
+                <input id="productCategoryName" type="text" name="productCategoryName" v-model="states.item.productCategoryName" placeholder="Product Category Name">
             </div>
              <div class="field">
-                <label>Product Category</label>
-                <input type="text" name="productCategory" v-model="states.item.productCategory" placeholder="Product Category">
+                <label>Description</label>
+                <textarea  name="description" v-model="states.item.description" placeholder="Description">
+                </textarea>
             </div>
-            <div class="field">
-                <label>Product Type</label>
-                <input type="text" name="productType" v-model="states.item.productType" placeholder="Product Type">
-            </div>
-            <div class="field">
-                <label>Product Standard Value</label>
-                <input type="text" name="productValue" v-model="states.item.productValue" placeholder="Product Standard Value">
-            </div>
-             <div class="field">
-                <label>Product Unit</label>
-                <input type="text" name="productUnit" v-model="states.item.productUnit" placeholder="Product Unit">
-            </div>
+           
             <div class="field required">
              <label>Status</label>
                 <select class="ui dropdown" v-model="states.item.statusCode">
@@ -84,16 +74,81 @@
     import datapager from '@/components/DataPager'
     import listview from '@/components/listview'
     import modalmessage from '@/components/modalmessage'
-    import productStore from '@/stores/products'
+    import productCategoriesStore from '@/stores/productCategories'
     import MasterPage from '@/classes/masterPage'
     import confirmmodal from '@/components/confirmmodal'
     import moredetailmodal from '@/components/moredetailmodal'
+    import api from '@/api/productCategory'
     
-    var master = new MasterPage()
-    master.use({store: productStore})
+    var master = new MasterPage(api)
+    master.use({store: productCategoriesStore})
+    master.members.labels.title = 'Product Category'
+    master.members.labels.titleDetail = 'Product Category'
+    master.members.labels.subtitle = `This is a product cagtegory master page. It's purpose to maintenance, create, update, delete and search.`
+    master.members.validateRules = {
+      fields: {
+        code: {
+          identifier: 'productCategoryCode',
+          rules: [{
+            type: 'empty',
+            prompt: 'Please enter your product category code!'
+          }]
+        },
+        name: {
+          identifier: 'productCategoryName',
+          rules: [{
+            type: 'empty',
+            prompt: 'Please enter your product category name!'
+          }]
+        },
+        statusCode: {
+          identifier: 'statusCode',
+          rules: [{
+            type: 'empty',
+            prompt: 'Please enter your status!'
+          }]
+        }
+      }
+    }
+
+    master.members.bindingKeys.headerKey = 'productCategoryCode'
+    master.members.bindingKeys.descKey = 'productCategoryName'
+    master.members.bindingKeys.itemsKey = 'productCategories'
+    master.members.bindingKeys.itemKey = 'productCategory'
+    master.members.bindingKeys.primaryKey = 'productCategoryCode'
+    master.members.bindingKeys.moreDetails.fields = [
+      {
+        label: 'Product Category Code',
+        keyId: 'productCategoryCode'
+      },
+      {
+        label: 'Product Category Name',
+        keyId: 'productCategoryName'
+      },
+      {
+        label: 'Status',
+        keyId: 'status'
+      }
+    ]
+    master.members.ids.selectedItemId = 'ddlProductCategorySelected'
+    master.members.ids.modalId = 'modalMessage'
+    master.members.ids.confirmId = 'confirmModal'
+
+    master.members.actionKeys.ADD_ITEM = 'addProductCategories'
+    master.members.actionKeys.GET_ITEM = 'getProductCategory'
+    master.members.actionKeys.GET_ITEMS = 'getProductCategories'
+    master.members.actionKeys.GET_MODE = 'getMode'
+    master.members.actionKeys.GET_TEXTSEARCH = 'getTextSearch'
+    master.members.actionKeys.GET_CURRENTPAGE = 'getCurrentPage'
+    master.members.actionKeys.SET_MODE = 'setMode'
+    master.members.actionKeys.SET_ITEMS = 'setProductCategories'
+    master.members.actionKeys.SET_TEXTSEARCH = 'setTextSearch'
+    master.members.actionKeys.SET_CURRENTPAGE = 'setCurrentPage'
+    master.members.actionKeys.UPDATE_ITEM = 'updateProductCategory'
+    master.members.actionKeys.REMOVE_ITEM = 'removeProductCategory'
 
     export default {
-      name: 'testpage',
+      name: 'productCategory',
       components: { pageheader, searchmaster, datapager, listview, modalmessage, confirmmodal, moredetailmodal },
       mounted: function () {
         master.actions.uis.createAccordion()

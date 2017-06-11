@@ -1,9 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Hello from '@/components/Hello'
-import Page2 from '@/components/Page2'
+import ProductCategory from '@/pages/ProductCategory'
 import TestPage from '../pages/TestPage'
 import MasterPage from '../pages/MasterPage'
+import LoginPage from '../pages/LoginPage'
 
 Vue.use(Router)
 
@@ -15,14 +16,19 @@ export default new Router({
       component: Hello
     },
     {
-      path: '/page2',
-      name: 'Page2',
-      component: Page2
+      path: '/productCategory',
+      name: 'ProductCategory',
+      component: ProductCategory
     },
     {
       path: '/testpage',
       name: 'testpage',
       component: TestPage
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: LoginPage
     },
     {
       path: '/masterpage',

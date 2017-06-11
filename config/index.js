@@ -29,6 +29,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {},
     facemindApiHost: {name: 'localhost', port: 3000, protocol: 'http://'},
+    facemindMongoDb: 'mongodb://localhost:27017/facemind',
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README
     // (https://github.com/webpack/css-loader#sourcemaps)
